@@ -14,7 +14,6 @@ os.environ.get("DEBUG", "False") == "True"
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
-    "jazzmin",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -94,32 +93,4 @@ STORAGES = {
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "/accounts/login/"
 
-JAZZMIN_SETTINGS = {
-    "site_title": "Chanda Book Admin",
-    "site_header": "Festival Chanda Book",
-    "site_brand": "ChandaBook",
-    "welcome_sign": "Welcome to Festival Chanda Book Admin",
-    "copyright": "Festival Chanda Book",
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "festival.festival": "fas fa-star-and-crescent",
-        "festival.chandamember": "fas fa-users",
-        "festival.chandacollection": "fas fa-hand-holding-usd",
-        "festival.festivalexpense": "fas fa-receipt",
-    },
-    "default_icon_parents": "fas fa-folder",
-    "default_icon_children": "fas fa-circle",
-    "show_sidebar": True,
-    "navigation_expanded": True,
-    "show_ui_builder": False,
-}
 
-JAZZMIN_UI_TWEAKS = {
-    "theme": "flatly",
-    "dark_mode_theme": "darkly",
-    "navbar": "navbar-white navbar-light",
-    "sidebar": "sidebar-light-warning",
-    "brand_colour": "navbar-warning",
-    "accent": "accent-warning",
-}
