@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sign Up – Chanda Book</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f0e8;--white:#fff;--surface:#fffdf5;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--green:#059669;--green-lt:#d1fae5;--red:#dc2626;--red-lt:#fee2e2;--text:#1c1917;--muted:#78716c;--radius:18px;--radius-sm:11px}
+    [data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--surface:#33250f;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:32px 28px;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.08)}
+    .logo{text-align:center;margin-bottom:24px}
+    .logo-icon{width:60px;height:60px;background:linear-gradient(135deg,#d97706,#ea580c);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 10px;box-shadow:0 5px 18px rgba(217,119,6,.35)}
+    .logo-title{font-size:1.3rem;font-weight:800;color:var(--text)}
+    .logo-sub{font-size:.8rem;color:var(--muted);margin-top:3px}
+    .form-group{margin-bottom:15px}
+    label{display:block;font-size:.77rem;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+    input{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:.9rem;background:var(--surface);color:var(--text);font-family:inherit;outline:none;transition:.15s}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:10px;font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:.15s;width:100%;justify-content:center;text-decoration:none}
+    .btn-primary{background:linear-gradient(135deg,#d97706,#ea580c);color:#fff}
+    .btn-primary:hover{filter:brightness(1.08)}
+    .error-msg{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red);border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:.83rem;display:flex;align-items:center;gap:8px}
+    .login-link{text-align:center;font-size:.84rem;color:var(--muted);margin-top:16px}
+    .login-link a{color:var(--accent);font-weight:700;text-decoration:none}
+    .hint{font-size:.7rem;color:var(--muted);margin-top:4px}
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">🪔</div>
+    <div class="logo-title">Create Account</div>
+    <div class="logo-sub">Join Chanda Book — Festival Fund Manager</div>
+  </div>
+
+  {% if messages %}
+  {% for m in messages %}
+  <div class="error-msg"><i class="ti ti-alert-circle"></i> {{ m }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Username *</label>
+      <input type="text" name="username" placeholder="Choose a username" autofocus required/>
+      <div class="hint">Letters, numbers, @/./+/-/_ only</div>
+    </div>
+    <div class="form-group">
+      <label>Email (optional)</label>
+      <input type="email" name="email" placeholder="your@email.com"/>
+    </div>
+    <div class="form-group">
+      <label>Password *</label>
+      <input type="password" name="password1" placeholder="Create a password" required/>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password *</label>
+      <input type="password" name="password2" placeholder="Repeat the password" required/>
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <i class="ti ti-user-plus"></i> Create Account
+    </button>
+  </form>
+
+  <div class="login-link">
+    Already have an account? <a href="/accounts/login/">Login</a>
+  </div>
+</div>
+</body>
+</html>

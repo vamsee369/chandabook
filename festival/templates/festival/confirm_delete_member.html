@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html><html lang="en"><head>
+  {% include 'pwa_tags.html' %}<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Remove Member</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--bg:#f5f0e8;--white:#fff;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--red:#dc2626;--text:#1c1917;--muted:#78716c;--radius:18px}[data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e}body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:32px 28px;max-width:400px;width:100%;text-align:center}.icon{font-size:3rem;margin-bottom:14px}.title{font-size:1.1rem;font-weight:800;margin-bottom:10px;color:var(--red)}.desc{font-size:.87rem;color:var(--muted);margin-bottom:22px;line-height:1.6}.btn-row{display:flex;gap:12px;justify-content:center}.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 20px;border-radius:9px;font-size:.87rem;font-weight:700;border:none;cursor:pointer;transition:.15s;text-decoration:none}.btn-danger{background:var(--red);color:#fff}.btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--accent)}</style></head>
+<body>
+<div class="card">
+  <div class="icon">👤</div>
+  <div class="title">Remove Member?</div>
+  <div class="desc">
+    Remove <strong>{{ member.name }}</strong> from <strong>{{ festival.name }}</strong>?<br/><br/>
+    Their chanda collection records will be kept but will no longer be linked to this member.
+  </div>
+  <div class="btn-row">
+    <form method="post">{% csrf_token %}
+      <button type="submit" class="btn btn-danger"><i class="ti ti-user-minus"></i> Remove</button>
+    </form>
+    <a href="{% url 'manage_members' fid=festival.id %}" class="btn btn-ghost">Cancel</a>
+  </div>
+</div>
+</body></html>

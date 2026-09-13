@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Members – {{ festival.name }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f0e8;--white:#fff;--surface:#fffdf5;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--green:#059669;--green-lt:#d1fae5;--red:#dc2626;--red-lt:#fee2e2;--blue:#2563eb;--blue-lt:#dbeafe;--orange:#ea580c;--text:#1c1917;--muted:#78716c;--radius:18px;--radius-sm:11px;--shadow:0 4px 24px rgba(0,0,0,.08)}
+    [data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--surface:#33250f;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1.5px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px}
+    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#d97706,#ea580c);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .back-btn{color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;font-size:.85rem}.back-btn:hover{color:var(--accent)}
+    .theme-toggle{width:34px;height:34px;background:var(--surface);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;color:var(--text);margin-left:auto}
+    .page{max-width:780px;margin:0 auto;padding:18px 14px 80px}
+    .page-title{font-size:1.2rem;font-weight:800;margin-bottom:16px}
+    .form-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-row3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+    .form-group{margin-bottom:12px}
+    label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+    input,select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:.88rem;background:var(--surface);color:var(--text);font-family:inherit;outline:none;transition:.15s}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt)}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:9px;font-size:.84rem;font-weight:600;border:none;cursor:pointer;transition:.15s;text-decoration:none}
+    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{filter:brightness(1.1)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--accent)}
+    .btn-sm{padding:6px 11px;font-size:.76rem}
+    .btn-danger{color:var(--red)}.btn-danger:hover{background:var(--red-lt);border-color:var(--red);color:var(--red)}
+    .member-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
+    .member-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .member-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--orange));display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;font-weight:700;flex-shrink:0}
+    .member-name{font-size:.95rem;font-weight:700}
+    .member-sub{font-size:.76rem;color:var(--muted);margin-top:2px}
+    .member-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+    .mstat{text-align:center;background:var(--surface);border-radius:8px;padding:8px}
+    .mstat-val{font-size:.9rem;font-weight:700}
+    .mstat-lbl{font-size:.65rem;color:var(--muted);margin-top:1px}
+    .badge{padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700}
+    .badge-green{background:var(--green-lt);color:var(--green)}
+    .badge-red{background:var(--red-lt);color:var(--red)}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .section-title{font-size:1rem;font-weight:700}
+    .msg-success{background:var(--green-lt);color:var(--green);border:1.5px solid var(--green);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:.84rem}
+    @media(max-width:520px){.form-row,.form-row3{grid-template-columns:1fr}.member-stats{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-icon">🪔</div>
+  <a href="{% url 'festival_dashboard' fid=festival.id %}" class="back-btn"><i class="ti ti-arrow-left"></i> Dashboard</a>
+  <div style="font-size:.82rem;color:var(--muted);flex:1;text-align:center;font-weight:600;">{{ festival.name }}</div>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+</div>
+
+<div class="page">
+  {% if messages %}{% for m in messages %}<div class="msg-success">✅ {{ m }}</div>{% endfor %}{% endif %}
+
+  <!-- Add Member Form -->
+  <div class="form-card">
+    <div class="page-title">👤 Add New Member</div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" name="name" placeholder="e.g. Ramesh Kumar" required/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" placeholder="9876543210"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Address / House No.</label>
+          <input type="text" name="address" placeholder="e.g. H.No. 42, Shiv Nagar"/>
+        </div>
+        <div class="form-group">
+          <label>Promised Amount (₹)</label>
+          <input type="number" name="promised_amount" min="0" step="0.01" placeholder="e.g. 500"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <input type="text" name="notes" placeholder="Optional notes about this member"/>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="ti ti-user-plus"></i> Add Member</button>
+    </form>
+  </div>
+
+  <!-- Members List -->
+  <div class="section-header">
+    <div class="section-title">👥 Members ({{ members.count }})</div>
+    <a href="{% url 'member_report' fid=festival.id %}" class="btn btn-ghost btn-sm"><i class="ti ti-report"></i> Full Report</a>
+  </div>
+
+  {% for member in members %}
+  <div class="member-card">
+    <div class="member-header">
+      <div class="member-avatar">{{ member.name|first|upper }}</div>
+      <div style="flex:1;">
+        <div class="member-name">{{ member.name }}</div>
+        <div class="member-sub">
+          {% if member.phone %}📞 {{ member.phone }}{% endif %}
+          {% if member.address %} &nbsp;•&nbsp; 🏠 {{ member.address }}{% endif %}
+        </div>
+      </div>
+      <span class="badge {% if member.is_fully_paid %}badge-green{% else %}badge-red{% endif %}">
+        {% if member.is_fully_paid %}✅ Paid{% else %}⏳ Pending{% endif %}
+      </span>
+    </div>
+    <div class="member-stats">
+      <div class="mstat">
+        <div class="mstat-val" style="color:var(--accent);">₹{{ member.promised_amount }}</div>
+        <div class="mstat-lbl">Promised</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-val" style="color:var(--green);">₹{{ member.total_paid }}</div>
+        <div class="mstat-lbl">Paid</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-val" style="color:{% if member.pending_amount > 0 %}var(--red){% else %}var(--green){% endif %};">₹{{ member.pending_amount }}</div>
+        <div class="mstat-lbl">Pending</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="{% url 'add_collection' fid=festival.id %}?member={{ member.id }}" class="btn btn-primary btn-sm"><i class="ti ti-plus"></i> Add Chanda</a>
+      <a href="{% url 'edit_member' fid=festival.id mid=member.id %}" class="btn btn-ghost btn-sm"><i class="ti ti-edit"></i> Edit</a>
+      <a href="{% url 'delete_member' fid=festival.id mid=member.id %}" class="btn btn-ghost btn-sm btn-danger"><i class="ti ti-trash"></i></a>
+    </div>
+  </div>
+  {% empty %}
+  <div style="text-align:center;padding:40px 20px;color:var(--muted);">
+    <div style="font-size:2.5rem;margin-bottom:10px;">👥</div>
+    <div>No members added yet. Add your first member above.</div>
+  </div>
+  {% endfor %}
+</div>
+<script>
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'':'dark');document.querySelector('.theme-toggle').textContent=d?'🌙':'☀️';localStorage.setItem('theme',d?'light':'dark');}
+(function(){const t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.addEventListener('DOMContentLoaded',()=>{const b=document.querySelector('.theme-toggle');if(b)b.textContent='☀️';});}})();
+</script>
+</body>
+</html>

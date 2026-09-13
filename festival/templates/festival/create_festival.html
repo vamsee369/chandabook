@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>New Festival – Chanda Book</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f0e8;--white:#fff;--surface:#fffdf5;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--green:#059669;--green-lt:#d1fae5;--red:#dc2626;--red-lt:#fee2e2;--text:#1c1917;--muted:#78716c;--radius:18px;--radius-sm:11px;--shadow:0 4px 24px rgba(0,0,0,.08)}
+    [data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--surface:#33250f;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1.5px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px}
+    .brand-icon{width:38px;height:38px;background:linear-gradient(135deg,#d97706,#ea580c);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+    .back-btn{color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;font-size:.85rem}.back-btn:hover{color:var(--accent)}
+    .theme-toggle{width:34px;height:34px;background:var(--surface);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;color:var(--text);margin-left:auto}
+    .page{max-width:580px;margin:0 auto;padding:24px 16px 80px}
+    .form-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px}
+    .form-title{font-size:1.2rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+    .form-group{margin-bottom:18px}
+    label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+    input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.9rem;background:var(--surface);color:var(--text);font-family:inherit;outline:none;transition:.15s}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt)}
+    textarea{resize:vertical;min-height:80px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:10px;font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:.15s;text-decoration:none;width:100%;justify-content:center}
+    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{filter:brightness(1.1)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--accent)}
+    .hint{font-size:.73rem;color:var(--muted);margin-top:5px}
+    .section-divider{border:none;border-top:1.5px solid var(--border);margin:20px 0}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-icon">🪔</div>
+  <a href="{% url 'festival_list' %}" class="back-btn"><i class="ti ti-arrow-left"></i> Back</a>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+</div>
+<div class="page">
+  <div class="form-card">
+    <div class="form-title">🎊 Create New Festival</div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Festival Name *</label>
+        <input type="text" name="name" placeholder="e.g. Ward-5 Durga Puja 2025" required/>
+        <div class="hint">A unique name to identify this festival event</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Festival Type *</label>
+          <select name="festival_type" required>
+            {% for val, label in festival_types %}
+            <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Location / Venue *</label>
+          <input type="text" name="location" placeholder="e.g. Shiv Nagar, Ward-5" required/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Start Date *</label>
+          <input type="date" name="start_date" required/>
+        </div>
+        <div class="form-group">
+          <label>End Date *</label>
+          <input type="date" name="end_date" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Target Collection (₹)</label>
+        <input type="number" name="target_collection" min="0" step="0.01" placeholder="e.g. 50000"/>
+        <div class="hint">Total amount you plan to collect (optional but helps track progress)</div>
+      </div>
+      <div class="form-group">
+        <label>Description / Notes</label>
+        <textarea name="description" placeholder="Any additional details about this festival event..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Create Festival</button>
+    </form>
+  </div>
+</div>
+<script>
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'':'dark');document.querySelector('.theme-toggle').textContent=d?'🌙':'☀️';localStorage.setItem('theme',d?'light':'dark');}
+(function(){const t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.addEventListener('DOMContentLoaded',()=>{const b=document.querySelector('.theme-toggle');if(b)b.textContent='☀️';});}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Member Report – {{ festival.name }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f0e8;--white:#fff;--surface:#fffdf5;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--green:#059669;--green-lt:#d1fae5;--red:#dc2626;--red-lt:#fee2e2;--orange:#ea580c;--text:#1c1917;--muted:#78716c;--radius:18px;--radius-sm:11px}
+    [data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--surface:#33250f;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1.5px solid var(--border);padding:11px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px}
+    .brand-icon{width:35px;height:35px;background:linear-gradient(135deg,#7c3aed,#2563eb);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .back-btn{color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;font-size:.84rem}.back-btn:hover{color:var(--accent)}
+    .theme-toggle{width:33px;height:33px;background:var(--surface);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;color:var(--text);margin-left:auto}
+    .page{max-width:860px;margin:0 auto;padding:16px 14px 80px}
+    .page-title{font-size:1.2rem;font-weight:800;margin-bottom:16px}
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+    .sum-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center}
+    .sum-val{font-size:1.3rem;font-weight:800}
+    .sum-lbl{font-size:.72rem;color:var(--muted);margin-top:3px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:.82rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:.15s}
+    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{filter:brightness(1.1)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--accent)}
+    .btn-sm{padding:5px 10px;font-size:.74rem}
+    .member-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:12px;overflow:hidden}
+    .member-card.paid-card{border-color:var(--green)}
+    .member-card.pending-card{border-color:#fbbf24}
+    .mcard-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer}
+    .mcard-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0}
+    .mcard-name{font-size:.95rem;font-weight:700;flex:1}
+    .mcard-sub{font-size:.74rem;color:var(--muted)}
+    .badge{padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700}
+    .badge-green{background:var(--green-lt);color:var(--green)}
+    .badge-orange{background:#fef3c7;color:#92400e}
+    .mcard-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 12px}
+    .mstat{text-align:center;background:var(--surface);border-radius:8px;padding:8px}
+    .mstat-val{font-size:.88rem;font-weight:700}
+    .mstat-lbl{font-size:.65rem;color:var(--muted)}
+    .progress-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:0 16px 12px}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--green),#34d399);border-radius:3px}
+    .coll-list{border-top:1.5px solid var(--border);padding:10px 16px;display:none}
+    .coll-list.open{display:block}
+    .coll-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+    .coll-row:last-child{border-bottom:none}
+    .coll-date{font-size:.75rem;color:var(--muted);width:90px;flex-shrink:0}
+    .coll-mode{font-size:.72rem;color:var(--muted);flex:1}
+    .coll-amt{font-size:.9rem;font-weight:700;color:var(--green)}
+    .empty{text-align:center;padding:40px;color:var(--muted)}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-icon">📊</div>
+  <a href="{% url 'festival_dashboard' fid=festival.id %}" class="back-btn"><i class="ti ti-arrow-left"></i> Dashboard</a>
+  <div style="font-size:.8rem;color:var(--muted);flex:1;text-align:center;font-weight:600;">{{ festival.name }}</div>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+</div>
+
+<div class="page">
+  <div class="page-title">📊 Member-wise Chanda Report</div>
+
+  {% with total_members=rows|length %}
+  <div class="summary-grid">
+    <div class="sum-card">
+      <div class="sum-val">{{ total_members }}</div>
+      <div class="sum-lbl">Total Members</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-val" style="color:var(--green);">
+        {% with paid_count=0 %}
+        {{ rows|length }}{% comment %}calculated below{% endcomment %}
+        {% endwith %}
+        <!-- calculated inline -->
+      </div>
+      <div class="sum-lbl">Members Fully Paid</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-val" style="color:var(--red);">
+        {% for r in rows %}{% if not r.paid_fully %}⬤ {% endif %}{% endfor %}
+      </div>
+      <div class="sum-lbl">Pending Members</div>
+    </div>
+  </div>
+  {% endwith %}
+
+  <!-- Better summary block -->
+  <div class="summary-grid" style="margin-bottom:20px;">
+    {% with paid_members=0 pending_members=0 %}
+    <div class="sum-card">
+      <div class="sum-val" style="color:var(--green);">
+        {% for r in rows %}{% if r.paid_fully %}{% with c=1 %}{{ c }}{% endwith %}{% endif %}{% endfor %}
+      </div>
+      <div class="sum-lbl">Fully Paid ✅</div>
+    </div>
+    {% endwith %}
+    <div class="sum-card">
+      <div class="sum-val" style="color:var(--accent);">
+        ₹{% for r in rows %}{% endfor %}
+      </div>
+      <div class="sum-lbl">Total Promised</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+    <a href="{% url 'add_collection' fid=festival.id %}" class="btn btn-primary"><i class="ti ti-plus"></i> Add Chanda</a>
+    <a href="{% url 'manage_members' fid=festival.id %}" class="btn btn-ghost"><i class="ti ti-users"></i> Manage Members</a>
+    <a href="{% url 'export_summary' fid=festival.id %}" class="btn btn-ghost"><i class="ti ti-download"></i> Export</a>
+  </div>
+
+  {% for r in rows %}
+  <div class="member-card {% if r.paid_fully %}paid-card{% else %}pending-card{% endif %}">
+    <div class="mcard-header" onclick="toggleDetail('detail-{{ forloop.counter }}')">
+      <div class="mcard-avatar" style="background:{% if r.paid_fully %}var(--green){% else %}#d97706{% endif %};">
+        {{ r.member.name|first|upper }}
+      </div>
+      <div style="flex:1;">
+        <div class="mcard-name">{{ r.member.name }}</div>
+        <div class="mcard-sub">
+          {% if r.member.phone %}📞 {{ r.member.phone }}{% endif %}
+          {% if r.member.address %} &nbsp;•&nbsp; 🏠 {{ r.member.address }}{% endif %}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <span class="badge {% if r.paid_fully %}badge-green{% else %}badge-orange{% endif %}">
+          {% if r.paid_fully %}✅ Paid{% else %}⏳ Pending{% endif %}
+        </span>
+        <span style="font-size:.65rem;color:var(--muted);">{{ r.collections|length }} payment{% if r.collections|length != 1 %}s{% endif %} &nbsp; ▼</span>
+      </div>
+    </div>
+
+    <div class="mcard-stats">
+      <div class="mstat">
+        <div class="mstat-val" style="color:var(--accent);">₹{{ r.member.promised_amount }}</div>
+        <div class="mstat-lbl">Promised</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-val" style="color:var(--green);">₹{{ r.paid }}</div>
+        <div class="mstat-lbl">Paid</div>
+      </div>
+      <div class="mstat">
+        <div class="mstat-val" style="color:{% if r.pending > 0 %}var(--red){% else %}var(--green){% endif %};">₹{{ r.pending }}</div>
+        <div class="mstat-lbl">Pending</div>
+      </div>
+    </div>
+
+    {% if r.member.promised_amount > 0 %}
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:{% widthratio r.paid r.member.promised_amount 100 %}%"></div>
+    </div>
+    {% endif %}
+
+    <div class="coll-list" id="detail-{{ forloop.counter }}">
+      {% for c in r.collections %}
+      <div class="coll-row">
+        <div class="coll-date">{{ c.date_collected }}</div>
+        <div class="coll-mode">{{ c.payment_mode }}{% if c.receipt_no %} · {{ c.receipt_no }}{% endif %}{% if c.collected_by %} · by {{ c.collected_by }}{% endif %}</div>
+        <div class="coll-amt">+₹{{ c.amount }}</div>
+      </div>
+      {% empty %}
+      <div style="padding:10px 0;color:var(--muted);font-size:.82rem;text-align:center;">No payments yet</div>
+      {% endfor %}
+      <div style="padding:8px 0;display:flex;gap:8px;">
+        <a href="{% url 'add_collection' fid=festival.id %}?member={{ r.member.id }}" class="btn btn-primary btn-sm"><i class="ti ti-plus"></i> Add Chanda</a>
+        <a href="{% url 'edit_member' fid=festival.id mid=r.member.id %}" class="btn btn-ghost btn-sm"><i class="ti ti-edit"></i> Edit</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty">
+    <div style="font-size:2.5rem;margin-bottom:10px;">👥</div>
+    <div>No members added to this festival yet.</div>
+    <a href="{% url 'manage_members' fid=festival.id %}" class="btn btn-primary" style="margin-top:14px;width:auto;"><i class="ti ti-user-plus"></i> Add Members</a>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+function toggleDetail(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'':'dark');document.querySelector('.theme-toggle').textContent=d?'🌙':'☀️';localStorage.setItem('theme',d?'light':'dark');}
+(function(){const t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.addEventListener('DOMContentLoaded',()=>{const b=document.querySelector('.theme-toggle');if(b)b.textContent='☀️';});}})();
+</script>
+</body>
+</html>

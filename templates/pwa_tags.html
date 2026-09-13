@@ -1,0 +1,110 @@
+{% load static %}
+<!-- ── PWA Meta Tags ── -->
+<meta name="theme-color" content="#d97706"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Chanda Book"/>
+<meta name="application-name" content="Chanda Book"/>
+<meta name="msapplication-TileColor" content="#d97706"/>
+<meta name="msapplication-TileImage" content="{% static 'icons/icon-144.png' %}"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="apple-touch-icon" sizes="152x152" href="{% static 'icons/icon-152.png' %}"/>
+<link rel="apple-touch-icon" sizes="192x192" href="{% static 'icons/icon-192.png' %}"/>
+<link rel="icon" type="image/png" sizes="192x192" href="{% static 'icons/icon-192.png' %}"/>
+<link rel="icon" type="image/png" sizes="512x512" href="{% static 'icons/icon-512.png' %}"/>
+
+<!-- ── PWA Install prompt + Service Worker ── -->
+<script>
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(reg => {
+          console.log('[Chanda Book] SW registered, scope:', reg.scope);
+          reg.addEventListener('updatefound', () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                showUpdateBanner();
+              }
+            });
+          });
+        })
+        .catch(err => console.warn('[Chanda Book] SW error:', err));
+    });
+  }
+
+  // Show update banner when new SW is available
+  function showUpdateBanner() {
+    const banner = document.createElement('div');
+    banner.id = 'pwa-update-banner';
+    banner.innerHTML = `
+      <div style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+                  background:#1c1917;color:#fff;border-radius:12px;padding:12px 18px;
+                  display:flex;align-items:center;gap:12px;z-index:9999;
+                  box-shadow:0 4px 20px rgba(0,0,0,.4);font-size:.85rem;max-width:340px;width:90%;">
+        <span>🪔 New version available!</span>
+        <button onclick="location.reload()" 
+                style="background:#d97706;color:#fff;border:none;border-radius:8px;
+                       padding:6px 14px;font-size:.8rem;font-weight:700;cursor:pointer;">
+          Update
+        </button>
+        <button onclick="this.parentElement.parentElement.remove()"
+                style="background:transparent;color:#a8a29e;border:none;cursor:pointer;font-size:1rem;">✕</button>
+      </div>`;
+    document.body.appendChild(banner);
+  }
+
+  // PWA install prompt (Add to Home Screen)
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallBtn();
+  });
+
+  function showInstallBtn() {
+    // Only show if not already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) return;
+    const existing = document.getElementById('pwa-install-btn');
+    if (existing) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'pwa-install-btn';
+    btn.innerHTML = '📲 Add to Home Screen';
+    btn.style.cssText = `
+      position:fixed;bottom:16px;right:16px;
+      background:linear-gradient(135deg,#d97706,#ea580c);
+      color:#fff;border:none;border-radius:12px;
+      padding:11px 18px;font-size:.82rem;font-weight:700;
+      cursor:pointer;z-index:9999;
+      box-shadow:0 4px 16px rgba(217,119,6,.5);
+      display:flex;align-items:center;gap:7px;
+      animation:slideUp .4s ease;
+    `;
+    btn.onclick = async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') btn.remove();
+      deferredPrompt = null;
+    };
+    document.body.appendChild(btn);
+
+    // Auto-hide after 8 seconds
+    setTimeout(() => { if (btn.parentElement) btn.remove(); }, 8000);
+  }
+
+  window.addEventListener('appinstalled', () => {
+    const btn = document.getElementById('pwa-install-btn');
+    if (btn) btn.remove();
+    console.log('[Chanda Book] PWA installed!');
+  });
+</script>
+<style>
+  @keyframes slideUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+</style>

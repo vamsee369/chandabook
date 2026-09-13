@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Add Chanda – {{ festival.name }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f0e8;--white:#fff;--surface:#fffdf5;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--green:#059669;--green-lt:#d1fae5;--red:#dc2626;--red-lt:#fee2e2;--text:#1c1917;--muted:#78716c;--radius:18px;--radius-sm:11px}
+    [data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--surface:#33250f;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1.5px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px}
+    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#059669,#10b981);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .back-btn{color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;font-size:.85rem}.back-btn:hover{color:var(--accent)}
+    .theme-toggle{width:34px;height:34px;background:var(--surface);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;color:var(--text);margin-left:auto}
+    .page{max-width:580px;margin:0 auto;padding:22px 14px 80px}
+    .form-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px}
+    .form-title{font-size:1.15rem;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px}
+    .form-group{margin-bottom:16px}
+    label{display:block;font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+    input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:9px;font-size:.9rem;background:var(--surface);color:var(--text);font-family:inherit;outline:none;transition:.15s}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-lt)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:12px 24px;border-radius:10px;font-size:.9rem;font-weight:700;border:none;cursor:pointer;transition:.15s;text-decoration:none;width:100%;justify-content:center}
+    .btn-primary{background:#059669;color:#fff}.btn-primary:hover{filter:brightness(1.1)}
+    .hint{font-size:.72rem;color:var(--muted);margin-top:4px}
+    .member-quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:4px}
+    .mq-btn{padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;background:var(--surface);cursor:pointer;text-align:left;transition:.15s}
+    .mq-btn:hover,.mq-btn.selected{border-color:var(--accent);background:var(--accent-lt)}
+    .mq-name{font-size:.82rem;font-weight:600}
+    .mq-pending{font-size:.7rem;color:var(--red)}
+    .anon-toggle{display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer;font-size:.85rem;color:var(--muted);font-weight:500}
+    @media(max-width:480px){.form-row{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-icon">💵</div>
+  <a href="{% url 'festival_dashboard' fid=festival.id %}" class="back-btn"><i class="ti ti-arrow-left"></i> {{ festival.name }}</a>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+</div>
+
+<div class="page">
+  <div class="form-card">
+    <div class="form-title">💵 Record Chanda Collection</div>
+    <form method="post" id="chandaForm">
+      {% csrf_token %}
+
+      <!-- Member selector -->
+      <div class="form-group">
+        <label>Select Member (or leave blank for anonymous donor)</label>
+        {% if members %}
+        <div class="member-quick">
+          {% for m in members %}
+          <div class="mq-btn {% if request.GET.member == m.id|stringformat:'s' %}selected{% endif %}"
+               onclick="selectMember({{ m.id }}, '{{ m.name }}', {{ m.pending_amount }})">
+            <div class="mq-name">{{ m.name }}</div>
+            {% if m.pending_amount > 0 %}<div class="mq-pending">Pending ₹{{ m.pending_amount }}</div>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <input type="hidden" name="member_id" id="memberIdInput"/>
+        <div class="anon-toggle" onclick="clearMember()">
+          <input type="checkbox" id="anonCheck"/> Anonymous / Walk-in Donor
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Donor Name *</label>
+        <input type="text" name="donor_name" id="donorNameInput" placeholder="Auto-filled on member select, or enter manually" required/>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount (₹) *</label>
+          <input type="number" name="amount" id="amountInput" min="1" step="0.01" placeholder="e.g. 500" required/>
+        </div>
+        <div class="form-group">
+          <label>Payment Mode *</label>
+          <select name="payment_mode" required>
+            {% for val, label in payment_choices %}
+            <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Collected By *</label>
+          <input type="text" name="collected_by" placeholder="Name of collector" required/>
+        </div>
+        <div class="form-group">
+          <label>Date Collected *</label>
+          <input type="date" name="date_collected" value="{{ today }}" required/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Receipt No.</label>
+          <input type="text" name="receipt_no" placeholder="e.g. RCP-001"/>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" name="notes" placeholder="Optional notes"/>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary"><i class="ti ti-check"></i> Save Chanda</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function selectMember(id, name, pending) {
+  document.getElementById('memberIdInput').value = id;
+  document.getElementById('donorNameInput').value = name;
+  if (pending > 0) document.getElementById('amountInput').value = pending;
+  document.querySelectorAll('.mq-btn').forEach(b => b.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('anonCheck').checked = false;
+}
+function clearMember() {
+  document.getElementById('memberIdInput').value = '';
+  document.getElementById('donorNameInput').value = '';
+  document.querySelectorAll('.mq-btn').forEach(b => b.classList.remove('selected'));
+}
+// Pre-select if ?member= in URL
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(location.search);
+  const mid = params.get('member');
+  if (mid) {
+    const btns = document.querySelectorAll('.mq-btn');
+    btns.forEach(b => {
+      if (b.getAttribute('onclick').includes(`(${mid},`)) {
+        b.click();
+      }
+    });
+  }
+});
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'':'dark');document.querySelector('.theme-toggle').textContent=d?'🌙':'☀️';localStorage.setItem('theme',d?'light':'dark');}
+(function(){const t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.addEventListener('DOMContentLoaded',()=>{const b=document.querySelector('.theme-toggle');if(b)b.textContent='☀️';});}})();
+</script>
+</body>
+</html>

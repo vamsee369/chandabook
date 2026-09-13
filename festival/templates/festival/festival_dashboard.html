@@ -1,0 +1,225 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{{ festival.name }} – Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f0e8;--white:#fff;--surface:#fffdf5;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--green:#059669;--green-lt:#d1fae5;--red:#dc2626;--red-lt:#fee2e2;--blue:#2563eb;--blue-lt:#dbeafe;--orange:#ea580c;--orange-lt:#ffedd5;--purple:#7c3aed;--purple-lt:#ede9fe;--text:#1c1917;--muted:#78716c;--radius:18px;--radius-sm:11px;--shadow:0 4px 24px rgba(0,0,0,.08);--shadow-sm:0 2px 8px rgba(0,0,0,.05)}
+    [data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--surface:#33250f;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e;--shadow:0 4px 24px rgba(0,0,0,.4)}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1.5px solid var(--border);padding:11px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px}
+    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,#d97706,#ea580c);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .back-btn{color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;font-size:.85rem}.back-btn:hover{color:var(--accent)}
+    .theme-toggle{width:34px;height:34px;background:var(--surface);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.95rem;color:var(--text);margin-left:auto}
+    .page{max-width:900px;margin:0 auto;padding:16px 14px 80px}
+    .festival-hero{background:linear-gradient(135deg,#d97706,#ea580c,#dc2626);border-radius:var(--radius);padding:24px 20px 20px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden}
+    .festival-hero::after{content:'🪔';position:absolute;right:16px;bottom:-8px;font-size:5rem;opacity:.15}
+    .festival-name{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+    .festival-meta{font-size:.82rem;opacity:.85}
+    .hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .hero-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;font-size:.84rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:.15s}
+    .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{filter:brightness(1.1)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--accent)}
+    .btn-sm{padding:6px 12px;font-size:.78rem}
+    .btn-danger{background:var(--red-lt);color:var(--red);border:1.5px solid var(--red)}.btn-danger:hover{background:var(--red);color:#fff}
+    .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}
+    .kpi{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:18px 16px}
+    .kpi-icon{font-size:1.5rem;margin-bottom:8px}
+    .kpi-val{font-size:1.5rem;font-weight:800;color:var(--text)}
+    .kpi-lbl{font-size:.75rem;color:var(--muted);margin-top:3px}
+    .progress-wrap{margin-top:10px}
+    .progress-bar{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--orange));border-radius:4px;transition:width .4s}
+    .progress-lbl{font-size:.7rem;color:var(--muted);text-align:right;margin-top:4px}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .section-title{font-size:.95rem;font-weight:700}
+    .badge{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700}
+    .badge-green{background:var(--green-lt);color:var(--green)}
+    .badge-red{background:var(--red-lt);color:var(--red)}
+    .badge-blue{background:var(--blue-lt);color:var(--blue)}
+    .badge-muted{background:var(--border);color:var(--muted)}
+    .card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:10px}
+    .row{display:flex;align-items:center;gap:10px}
+    .row-main{flex:1}
+    .row-name{font-size:.9rem;font-weight:600}
+    .row-sub{font-size:.75rem;color:var(--muted);margin-top:1px}
+    .row-amount{font-size:1rem;font-weight:700;text-align:right}
+    .action-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+    .nav-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+    .nav-btn{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 12px;text-decoration:none;display:flex;align-items:center;gap:10px;transition:.15s;color:var(--text)}
+    .nav-btn:hover{border-color:var(--accent);background:var(--accent-lt)}
+    .nav-btn-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .nav-btn-label{font-size:.85rem;font-weight:600}
+    .nav-btn-sub{font-size:.7rem;color:var(--muted)}
+    .cat-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+    .cat-row:last-child{border-bottom:none}
+    .cat-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+    .cat-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--orange));border-radius:3px}
+    .cat-label{font-size:.78rem;width:120px;flex-shrink:0;color:var(--text-md)}
+    .cat-val{font-size:.82rem;font-weight:700;width:80px;text-align:right;flex-shrink:0}
+    .empty-row{text-align:center;padding:20px;color:var(--muted);font-size:.85rem}
+    @media(min-width:600px){.kpi-grid{grid-template-columns:repeat(4,1fr)}.nav-actions{grid-template-columns:repeat(4,1fr)}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-icon">🪔</div>
+  <a href="{% url 'festival_list' %}" class="back-btn"><i class="ti ti-arrow-left"></i> Festivals</a>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+</div>
+<div class="page">
+
+  <!-- Hero -->
+  <div class="festival-hero">
+    <div class="festival-name">{{ festival.name }}</div>
+    <div class="festival-meta">📍 {{ festival.location }}&nbsp;&nbsp;•&nbsp;&nbsp;🗓️ {{ festival.start_date }} – {{ festival.end_date }}</div>
+    <div class="hero-badges">
+      <span class="hero-badge">{{ festival.festival_type }}</span>
+      <span class="hero-badge">{{ festival.status }}</span>
+      {% if festival.description %}<span class="hero-badge" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ festival.description }}</span>{% endif %}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+      <a href="{% url 'edit_festival' fid=festival.id %}" class="btn" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:7px 14px;font-size:.8rem;"><i class="ti ti-edit"></i> Edit</a>
+      <a href="{% url 'export_summary' fid=festival.id %}" class="btn" style="background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:7px 14px;font-size:.8rem;"><i class="ti ti-file-text"></i> .TXT</a>
+      <a href="{% url 'export_pdf' fid=festival.id %}" class="btn" style="background:rgba(255,255,255,.3);border:1.5px solid rgba(255,255,255,.6);color:#fff;padding:7px 14px;font-size:.8rem;font-weight:700;"><i class="ti ti-file-type-pdf"></i> Download PDF</a>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-val" style="color:var(--green);">₹{{ total_collected }}</div>
+      <div class="kpi-lbl">Total Collected</div>
+      {% if target %}
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:{{ collection_pct }}%"></div></div>
+        <div class="progress-lbl">{{ collection_pct }}% of ₹{{ target }}</div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">📤</div>
+      <div class="kpi-val" style="color:var(--red);">₹{{ total_expenses }}</div>
+      <div class="kpi-lbl">Total Expenses</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">{% if balance >= 0 %}✅{% else %}⚠️{% endif %}</div>
+      <div class="kpi-val" style="color:{% if balance >= 0 %}var(--green){% else %}var(--red){% endif %};">₹{{ balance }}</div>
+      <div class="kpi-lbl">Balance (Surplus / Deficit)</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-val">{{ members.count }}</div>
+      <div class="kpi-lbl">Members &nbsp;
+        <span style="color:var(--green);font-weight:700;">{{ members_paid }} paid</span> /
+        <span style="color:var(--red);font-weight:700;">{{ members_pending }} pending</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Nav -->
+  <div class="nav-actions">
+    <a href="{% url 'add_collection' fid=festival.id %}" class="nav-btn">
+      <div class="nav-btn-icon" style="background:var(--green-lt);">💵</div>
+      <div><div class="nav-btn-label">Add Chanda</div><div class="nav-btn-sub">Record donation</div></div>
+    </a>
+    <a href="{% url 'add_expense' fid=festival.id %}" class="nav-btn">
+      <div class="nav-btn-icon" style="background:var(--red-lt);">🧾</div>
+      <div><div class="nav-btn-label">Add Expense</div><div class="nav-btn-sub">Log spending</div></div>
+    </a>
+    <a href="{% url 'manage_members' fid=festival.id %}" class="nav-btn">
+      <div class="nav-btn-icon" style="background:var(--blue-lt);">👤</div>
+      <div><div class="nav-btn-label">Members</div><div class="nav-btn-sub">{{ members.count }} registered</div></div>
+    </a>
+    <a href="{% url 'member_report' fid=festival.id %}" class="nav-btn">
+      <div class="nav-btn-icon" style="background:var(--purple-lt);">📊</div>
+      <div><div class="nav-btn-label">Reports</div><div class="nav-btn-sub">Member-wise summary</div></div>
+    </a>
+  </div>
+
+  <!-- Recent Collections -->
+  <div class="section-head">
+    <div class="section-title">💰 Recent Chandas</div>
+    <a href="{% url 'view_collections' fid=festival.id %}" style="font-size:.78rem;color:var(--accent);text-decoration:none;font-weight:600;">View all →</a>
+  </div>
+  <div class="card">
+    {% for c in collections %}
+    <div class="row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:9px;background:var(--green-lt);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">💵</div>
+      <div class="row-main">
+        <div class="row-name">{{ c.donor_name }}</div>
+        <div class="row-sub">{{ c.payment_mode }} &nbsp;•&nbsp; {{ c.date_collected }} &nbsp;•&nbsp; by {{ c.collected_by }}</div>
+      </div>
+      <div class="row-amount" style="color:var(--green);">+₹{{ c.amount }}</div>
+    </div>
+    {% empty %}
+    <div class="empty-row">No chandas recorded yet. <a href="{% url 'add_collection' fid=festival.id %}" style="color:var(--accent);">Add first chanda →</a></div>
+    {% endfor %}
+  </div>
+
+  <!-- Recent Expenses -->
+  <div class="section-head">
+    <div class="section-title">📤 Recent Expenses</div>
+    <a href="{% url 'view_expenses' fid=festival.id %}" style="font-size:.78rem;color:var(--accent);text-decoration:none;font-weight:600;">View all →</a>
+  </div>
+  <div class="card">
+    {% for e in expenses %}
+    <div class="row" style="padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:9px;background:var(--red-lt);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🧾</div>
+      <div class="row-main">
+        <div class="row-name">{{ e.title }}</div>
+        <div class="row-sub">{{ e.category }} &nbsp;•&nbsp; {{ e.date }} &nbsp;•&nbsp; {{ e.paid_by }}</div>
+      </div>
+      <div class="row-amount" style="color:var(--red);">-₹{{ e.amount }}</div>
+    </div>
+    {% empty %}
+    <div class="empty-row">No expenses yet. <a href="{% url 'add_expense' fid=festival.id %}" style="color:var(--accent);">Add first expense →</a></div>
+    {% endfor %}
+  </div>
+
+  <!-- Expense by Category -->
+  {% if exp_by_cat %}
+  <div class="section-head" style="margin-top:20px;">
+    <div class="section-title">📂 Expenses by Category</div>
+  </div>
+  <div class="card">
+    {% for cat in exp_by_cat %}
+    <div class="cat-row">
+      <div class="cat-label">{{ cat.category }}</div>
+      <div class="cat-bar">
+        <div class="cat-fill" style="width:{% widthratio cat.total total_expenses 100 %}%"></div>
+      </div>
+      <div class="cat-val">₹{{ cat.total }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Payment mode breakdown -->
+  {% if coll_by_mode %}
+  <div class="section-head" style="margin-top:20px;">
+    <div class="section-title">💳 Collections by Mode</div>
+  </div>
+  <div class="card" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
+    {% for m in coll_by_mode %}
+    <div style="text-align:center;background:var(--surface);border-radius:10px;padding:12px;">
+      <div style="font-size:.85rem;font-weight:700;color:var(--text);">₹{{ m.total }}</div>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:2px;">{{ m.payment_mode }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+<script>
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'':'dark');document.querySelector('.theme-toggle').textContent=d?'🌙':'☀️';localStorage.setItem('theme',d?'light':'dark');}
+(function(){const t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.addEventListener('DOMContentLoaded',()=>{const b=document.querySelector('.theme-toggle');if(b)b.textContent='☀️';});}})();
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Offline – Chanda Book</title>
+  {% load static %}
+  {% include 'pwa_tags.html' %}
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f0e8; --white: #fff; --border: #e8dfc8;
+      --accent: #d97706; --muted: #78716c; --text: #1c1917;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 20px; padding: 40px 28px; max-width: 380px;
+      width: 100%; text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,.08);
+    }
+    .icon { font-size: 4rem; margin-bottom: 16px; }
+    h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+    p  { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 24px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, #d97706, #ea580c);
+      color: #fff; border: none; border-radius: 11px;
+      padding: 13px 28px; font-size: .9rem; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: .15s;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .cached-hint {
+      margin-top: 20px; font-size: .78rem; color: var(--muted);
+      background: #fef3c7; border-radius: 9px; padding: 10px 14px;
+    }
+    .status-dot {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; background: #dc2626;
+      margin-right: 6px; animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: .3; }
+    }
+    .divider { border: none; border-top: 1.5px solid var(--border); margin: 20px 0; }
+    .back-links { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+    .back-link {
+      font-size: .8rem; color: var(--accent); text-decoration: none;
+      font-weight: 600; padding: 6px 14px; border: 1.5px solid var(--border);
+      border-radius: 8px; background: var(--white);
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">🪔</div>
+  <h1>You're Offline</h1>
+  <p>
+    <span class="status-dot"></span>No internet connection detected.<br/>
+    Previously visited pages and data may still be available from your local cache.
+  </p>
+  <button class="btn" onclick="tryReconnect()">
+    🔄 Try Again
+  </button>
+  <hr class="divider"/>
+  <div class="cached-hint">
+    💡 Tip: While offline, you can still view pages you visited before. Try navigating to them directly.
+  </div>
+  <div class="back-links">
+    <a href="/" class="back-link">🏠 Home</a>
+    <a href="/festivals/" class="back-link">🎊 Festivals</a>
+  </div>
+</div>
+
+<script>
+function tryReconnect() {
+  const btn = event.currentTarget;
+  btn.textContent = '⏳ Checking…';
+  btn.disabled = true;
+  fetch('/').then(() => {
+    location.href = document.referrer || '/';
+  }).catch(() => {
+    btn.innerHTML = '🔄 Try Again';
+    btn.disabled = false;
+  });
+}
+
+// Auto-reconnect when network comes back
+window.addEventListener('online', () => {
+  location.href = document.referrer || '/';
+});
+</script>
+</body>
+</html>

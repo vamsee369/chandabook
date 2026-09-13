@@ -1,0 +1,361 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Festival Chanda Book</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f0e8; --white: #ffffff; --surface: #fffdf5;
+      --border: #e8dfc8; --accent: #d97706; --accent-lt: #fef3c7;
+      --accent-md: #fbbf24; --green: #059669; --green-lt: #d1fae5;
+      --red: #dc2626; --red-lt: #fee2e2; --blue: #2563eb; --blue-lt: #dbeafe;
+      --purple: #7c3aed; --purple-lt: #ede9fe; --orange: #ea580c; --orange-lt: #ffedd5;
+      --text: #1c1917; --text-md: #292524; --muted: #78716c; --muted-lt: #a8a29e;
+      --radius: 18px; --radius-sm: 11px;
+      --shadow: 0 4px 24px rgba(0,0,0,.08); --shadow-sm: 0 2px 8px rgba(0,0,0,.05);
+    }
+    [data-theme="dark"] {
+      --bg: #1c1208; --white: #2a1f0e; --surface: #33250f;
+      --border: #4a3520; --accent: #f59e0b; --accent-lt: #3a2500;
+      --text: #fef3c7; --text-md: #fde68a; --muted: #a8a29e; --muted-lt: #78716c;
+      --shadow: 0 4px 24px rgba(0,0,0,.4);
+    }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .topbar {
+      background: var(--white); border-bottom: 1.5px solid var(--border);
+      padding: 12px 16px; position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #d97706, #ea580c);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; box-shadow: 0 4px 14px rgba(217,119,6,.4);
+    }
+    .brand-name { font-size: 1rem; font-weight: 800; color: var(--text); }
+    .brand-tag  { font-size: .65rem; color: var(--muted); font-weight: 500; }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 10px; font-size: .85rem;
+      font-weight: 600; text-decoration: none; border: none; cursor: pointer;
+      transition: .15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { background: var(--accent-lt); color: var(--accent); border-color: var(--accent); }
+    .theme-toggle {
+      width: 36px; height: 36px; background: var(--surface);
+      border: 1.5px solid var(--border); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1rem; color: var(--text);
+      transition: .2s;
+    }
+    .page { max-width: 900px; margin: 0 auto; padding: 20px 16px 80px; }
+    .hero {
+      background: linear-gradient(135deg, #d97706 0%, #ea580c 60%, #dc2626 100%);
+      border-radius: var(--radius); padding: 32px 24px; margin-bottom: 28px;
+      color: #fff; text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '🪔'; position: absolute; right: 20px; top: 10px;
+      font-size: 5rem; opacity: .15;
+    }
+    .hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .hero p  { font-size: .95rem; opacity: .9; margin-bottom: 20px; }
+    .hero-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .hero-btn { background: rgba(255,255,255,.2); border: 1.5px solid rgba(255,255,255,.5); color: #fff; }
+    .hero-btn:hover { background: rgba(255,255,255,.35); }
+    .section-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .section-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700; }
+    .badge-green { background: var(--green-lt); color: var(--green); }
+    .badge-orange { background: var(--orange-lt); color: var(--orange); }
+    .badge-blue { background: var(--blue-lt); color: var(--blue); }
+    .badge-muted { background: var(--border); color: var(--muted); }
+    .festival-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 18px; margin-bottom: 12px;
+      text-decoration: none; color: var(--text);
+      display: block; transition: .15s;
+    }
+    .festival-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-1px); }
+    .festival-card-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .festival-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--orange));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .festival-name { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .festival-sub  { font-size: .78rem; color: var(--muted); }
+    .festival-meta { margin-left: auto; text-align: right; }
+    .festival-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .stat { text-align: center; background: var(--surface); border-radius: 10px; padding: 10px 8px; }
+    .stat-val { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .stat-lbl { font-size: .68rem; color: var(--muted); margin-top: 2px; }
+    .progress-wrap { margin-top: 10px; }
+    .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--orange)); border-radius: 3px; transition: width .4s; }
+    .progress-lbl  { font-size: .7rem; color: var(--muted); margin-top: 4px; text-align: right; }
+    .empty { text-align: center; padding: 40px 20px; }
+    .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-text { color: var(--muted); font-size: .9rem; }
+    .festival-icon-emoji { font-size: 1.5rem; }
+    .quick-actions { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 28px; }
+    .qa-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 16px; text-decoration: none;
+      display: flex; align-items: center; gap: 12px; transition: .15s;
+    }
+    .qa-card:hover { border-color: var(--accent); background: var(--accent-lt); }
+    .qa-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .qa-label { font-size: .88rem; font-weight: 600; color: var(--text); }
+    .qa-sub   { font-size: .72rem; color: var(--muted); }
+    .stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 28px; }
+    .stats-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 16px;
+    }
+    .stats-card-val { font-size: 1.5rem; font-weight: 800; color: var(--text); }
+    .stats-card-lbl { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+    .stats-card-icon { font-size: 1.5rem; margin-bottom: 8px; }
+    @media(max-width:480px) {
+      .festival-stats { grid-template-columns: repeat(2,1fr); }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-icon">🪔</div>
+  <div>
+    <div class="brand-name">Chanda Book</div>
+    <div class="brand-tag">Festival Fund Manager</div>
+  </div>
+  <div class="topbar-right">
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</div>
+    {% if user.is_authenticated %}
+      <a href="/accounts/logout/" class="btn btn-ghost" style="padding:6px 12px;">
+        <i class="ti ti-logout"></i> Logout
+      </a>
+    {% else %}
+      <a href="/accounts/login/" class="btn btn-primary">Login</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="page">
+{% if user.is_authenticated %}
+
+  <!-- Hero -->
+  <div class="hero">
+    <div style="font-size:2.5rem; margin-bottom:8px;">🪔</div>
+    <h1>Festival Chanda Book</h1>
+    <p>Track donations, manage expenses & balance your festival funds effortlessly</p>
+    <div class="hero-actions">
+      <a href="{% url 'create_festival' %}" class="btn hero-btn">
+        <i class="ti ti-plus"></i> New Festival
+      </a>
+      <a href="{% url 'festival_list' %}" class="btn hero-btn">
+        <i class="ti ti-list"></i> All Festivals
+      </a>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a href="{% url 'create_festival' %}" class="qa-card">
+      <div class="qa-icon" style="background:#fef3c7;">🎊</div>
+      <div>
+        <div class="qa-label">New Festival</div>
+        <div class="qa-sub">Create event & set target</div>
+      </div>
+    </a>
+    <a href="{% url 'festival_list' %}" class="qa-card">
+      <div class="qa-icon" style="background:#dbeafe;">📋</div>
+      <div>
+        <div class="qa-label">All Festivals</div>
+        <div class="qa-sub">View & manage all events</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- Ongoing Festivals -->
+  {% if ongoing %}
+  <div class="section-head">
+    <div class="section-title">🔴 Ongoing Festivals</div>
+    <span class="badge badge-green">{{ ongoing|length }} Active</span>
+  </div>
+  {% for f in ongoing %}
+  <a href="{% url 'festival_dashboard' fid=f.id %}" class="festival-card">
+    <div class="festival-card-header">
+      <div class="festival-icon"><span class="festival-icon-emoji">🎉</span></div>
+      <div style="flex:1;">
+        <div class="festival-name">{{ f.name }}</div>
+        <div class="festival-sub">📍 {{ f.location }} &nbsp;•&nbsp; {{ f.festival_type }}</div>
+        <div class="festival-sub" style="margin-top:3px;">📅 {{ f.start_date }} → {{ f.end_date }}</div>
+      </div>
+      <div class="festival-meta">
+        <span class="badge badge-green">Ongoing</span>
+      </div>
+    </div>
+    <div class="festival-stats">
+      <div class="stat">
+        <div class="stat-val" style="color:var(--green);">₹{{ f.total_collected }}</div>
+        <div class="stat-lbl">Collected</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" style="color:var(--red);">₹{{ f.total_expenses }}</div>
+        <div class="stat-lbl">Expenses</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" style="color:{% if f.balance >= 0 %}var(--green){% else %}var(--red){% endif %};">₹{{ f.balance }}</div>
+        <div class="stat-lbl">Balance</div>
+      </div>
+    </div>
+    {% if f.target_collection %}
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width:{{ f.collection_pct }}%"></div></div>
+      <div class="progress-lbl">{{ f.collection_pct }}% of ₹{{ f.target_collection }} target</div>
+    </div>
+    {% endif %}
+  </a>
+  {% endfor %}
+  {% endif %}
+
+  <!-- Upcoming -->
+  {% if upcoming %}
+  <div class="section-head" style="margin-top:24px;">
+    <div class="section-title">📅 Upcoming Festivals</div>
+    <span class="badge badge-blue">{{ upcoming|length }}</span>
+  </div>
+  {% for f in upcoming %}
+  <a href="{% url 'festival_dashboard' fid=f.id %}" class="festival-card">
+    <div class="festival-card-header">
+      <div class="festival-icon" style="background:linear-gradient(135deg,#2563eb,#7c3aed);">
+        <span class="festival-icon-emoji">🗓️</span>
+      </div>
+      <div style="flex:1;">
+        <div class="festival-name">{{ f.name }}</div>
+        <div class="festival-sub">📍 {{ f.location }} &nbsp;•&nbsp; {{ f.festival_type }}</div>
+        <div class="festival-sub" style="margin-top:3px;">📅 Starts {{ f.start_date }}</div>
+      </div>
+      <span class="badge badge-blue">Upcoming</span>
+    </div>
+  </a>
+  {% endfor %}
+  {% endif %}
+
+  <!-- Recent -->
+  {% if not ongoing and not upcoming %}
+  {% if recent %}
+  <div class="section-head">
+    <div class="section-title">🕐 Recent Festivals</div>
+    <a href="{% url 'festival_list' %}" style="font-size:.8rem;color:var(--accent);text-decoration:none;">View all →</a>
+  </div>
+  {% for f in recent %}
+  <a href="{% url 'festival_dashboard' fid=f.id %}" class="festival-card">
+    <div class="festival-card-header">
+      <div class="festival-icon"><span class="festival-icon-emoji">🎊</span></div>
+      <div style="flex:1;">
+        <div class="festival-name">{{ f.name }}</div>
+        <div class="festival-sub">{{ f.festival_type }} &nbsp;•&nbsp; {{ f.location }}</div>
+      </div>
+      <span class="badge {% if f.status == 'Completed' %}badge-muted{% elif f.status == 'Ongoing' %}badge-green{% else %}badge-blue{% endif %}">{{ f.status }}</span>
+    </div>
+    <div class="festival-stats">
+      <div class="stat">
+        <div class="stat-val" style="color:var(--green);">₹{{ f.total_collected }}</div>
+        <div class="stat-lbl">Collected</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" style="color:var(--red);">₹{{ f.total_expenses }}</div>
+        <div class="stat-lbl">Expenses</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">₹{{ f.balance }}</div>
+        <div class="stat-lbl">Balance</div>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+  {% else %}
+  <div class="empty">
+    <div class="empty-icon">🪔</div>
+    <div class="empty-text" style="font-weight:700;font-size:1rem;margin-bottom:8px;">No festivals yet</div>
+    <div class="empty-text">Create your first festival to start tracking chandas & expenses</div>
+    <a href="{% url 'create_festival' %}" class="btn btn-primary" style="margin-top:16px;">
+      <i class="ti ti-plus"></i> Create Festival
+    </a>
+  </div>
+  {% endif %}
+  {% endif %}
+
+{% else %}
+  <!-- Not logged in -->
+  <div style="text-align:center; padding: 60px 20px;">
+    <div style="font-size:4rem; margin-bottom:16px;">🪔</div>
+    <h1 style="font-size:1.8rem; font-weight:800; margin-bottom:10px;">Festival Chanda Book</h1>
+    <p style="color:var(--muted); margin-bottom:28px; max-width:400px; margin-left:auto; margin-right:auto;">
+      Manage chanda collections, track festival expenses, and keep your festival funds balanced — all in one place.
+    </p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <a href="/accounts/login/" class="btn btn-primary" style="font-size:1rem; padding:12px 28px;">
+        <i class="ti ti-login"></i> Login
+      </a>
+      <a href="/accounts/signup/" class="btn btn-ghost" style="font-size:1rem; padding:12px 28px;">
+        <i class="ti ti-user-plus"></i> Sign Up
+      </a>
+    </div>
+    <div style="margin-top:40px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; max-width:700px; margin-left:auto; margin-right:auto;">
+      <div style="background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:20px; text-align:center;">
+        <div style="font-size:2rem; margin-bottom:8px;">💰</div>
+        <div style="font-weight:700; margin-bottom:4px;">Track Chandas</div>
+        <div style="font-size:.8rem; color:var(--muted);">Record donations from every member with payment mode & receipt</div>
+      </div>
+      <div style="background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:20px; text-align:center;">
+        <div style="font-size:2rem; margin-bottom:8px;">📊</div>
+        <div style="font-weight:700; margin-bottom:4px;">Expense Manager</div>
+        <div style="font-size:.8rem; color:var(--muted);">Log pandal, decoration, food & all festival costs by category</div>
+      </div>
+      <div style="background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:20px; text-align:center;">
+        <div style="font-size:2rem; margin-bottom:8px;">📋</div>
+        <div style="font-weight:700; margin-bottom:4px;">Member Reports</div>
+        <div style="font-size:.8rem; color:var(--muted);">See who paid, who is pending & total collected at a glance</div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+</div>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? '' : 'dark');
+  document.querySelector('.theme-toggle').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+(function() {
+  const t = localStorage.getItem('theme');
+  if (t === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.querySelector('.theme-toggle');
+      if (btn) btn.textContent = '☀️';
+    });
+  }
+})();
+</script>
+</body>
+</html>

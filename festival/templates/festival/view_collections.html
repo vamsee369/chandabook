@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% include 'pwa_tags.html' %}
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Chanda Collections – {{ festival.name }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#f5f0e8;--white:#fff;--surface:#fffdf5;--border:#e8dfc8;--accent:#d97706;--accent-lt:#fef3c7;--green:#059669;--green-lt:#d1fae5;--red:#dc2626;--red-lt:#fee2e2;--blue:#2563eb;--blue-lt:#dbeafe;--text:#1c1917;--muted:#78716c;--radius:18px;--radius-sm:11px}
+    [data-theme=dark]{--bg:#1c1208;--white:#2a1f0e;--surface:#33250f;--border:#4a3520;--accent:#f59e0b;--accent-lt:#3a2500;--text:#fef3c7;--muted:#a8a29e}
+    body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:var(--white);border-bottom:1.5px solid var(--border);padding:11px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:10px}
+    .brand-icon{width:35px;height:35px;background:linear-gradient(135deg,#059669,#10b981);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .back-btn{color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;font-size:.84rem}.back-btn:hover{color:var(--accent)}
+    .theme-toggle{width:33px;height:33px;background:var(--surface);border:1.5px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;color:var(--text);margin-left:auto}
+    .page{max-width:860px;margin:0 auto;padding:16px 14px 80px}
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+    .page-title{font-size:1.15rem;font-weight:800}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:9px;font-size:.83rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:.15s}
+    .btn-primary{background:#059669;color:#fff}.btn-primary:hover{filter:brightness(1.1)}
+    .btn-ghost{background:transparent;color:var(--muted);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--accent-lt);color:var(--accent);border-color:var(--accent)}
+    .btn-sm{padding:5px 10px;font-size:.75rem}
+    .btn-danger{color:var(--red);border-color:var(--red)}.btn-danger:hover{background:var(--red-lt)}
+    .filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+    .filter-input{padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:.82rem;background:var(--surface);color:var(--text);outline:none;transition:.15s;flex:1;min-width:140px}
+    .filter-input:focus{border-color:var(--accent)}
+    .filter-select{padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-size:.82rem;background:var(--surface);color:var(--text);outline:none}
+    .summary-bar{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+    .summary-total{font-size:1.3rem;font-weight:800;color:var(--green)}
+    .summary-lbl{font-size:.75rem;color:var(--muted)}
+    .coll-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:9px;display:flex;align-items:flex-start;gap:12px}
+    .coll-icon{width:38px;height:38px;border-radius:9px;background:var(--green-lt);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .coll-main{flex:1}
+    .coll-name{font-size:.92rem;font-weight:700}
+    .coll-sub{font-size:.74rem;color:var(--muted);margin-top:2px;display:flex;flex-wrap:wrap;gap:6px}
+    .coll-sub-item{display:flex;align-items:center;gap:3px}
+    .coll-amount{font-size:1.05rem;font-weight:700;color:var(--green);white-space:nowrap}
+    .badge{padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:700}
+    .badge-cash{background:#fef3c7;color:#92400e}
+    .badge-upi{background:var(--blue-lt);color:var(--blue)}
+    .badge-bank{background:var(--green-lt);color:var(--green)}
+    .badge-default{background:var(--border);color:var(--muted)}
+    .empty{text-align:center;padding:40px;color:var(--muted)}
+    .msg-success{background:var(--green-lt);color:var(--green);border:1.5px solid var(--green);border-radius:9px;padding:10px 14px;margin-bottom:12px;font-size:.84rem}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-icon">💵</div>
+  <a href="{% url 'festival_dashboard' fid=festival.id %}" class="back-btn"><i class="ti ti-arrow-left"></i> {{ festival.name }}</a>
+  <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+</div>
+
+<div class="page">
+  {% if messages %}{% for m in messages %}<div class="msg-success">✅ {{ m }}</div>{% endfor %}{% endif %}
+
+  <div class="page-header">
+    <div class="page-title">💵 Chanda Collections</div>
+    <a href="{% url 'add_collection' fid=festival.id %}" class="btn btn-primary"><i class="ti ti-plus"></i> Add Chanda</a>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary-bar">
+    <div>
+      <div class="summary-total">₹{{ total }}</div>
+      <div class="summary-lbl">Total collected ({{ collections|length }} entries{% if filter_mode or filter_member or filter_q %} — filtered{% endif %})</div>
+    </div>
+    <a href="{% url 'export_summary' fid=festival.id %}" class="btn btn-ghost btn-sm"><i class="ti ti-file-text"></i> .TXT</a>
+    <a href="{% url 'export_pdf' fid=festival.id %}" class="btn btn-ghost btn-sm" style="color:#7c3aed;border-color:#7c3aed;"><i class="ti ti-file-type-pdf"></i> PDF</a>
+  </div>
+
+  <!-- Filters -->
+  <form method="get" class="filter-bar">
+    <input class="filter-input" type="text" name="q" value="{{ filter_q }}" placeholder="🔍 Search donor, receipt no..."/>
+    <input class="filter-input" type="text" name="member" value="{{ filter_member }}" placeholder="Filter by member name"/>
+    <select class="filter-select" name="mode" onchange="this.form.submit()">
+      <option value="">All Modes</option>
+      {% for val, label in payment_choices %}<option value="{{ val }}" {% if filter_mode == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="btn btn-ghost btn-sm"><i class="ti ti-filter"></i></button>
+    {% if filter_q or filter_member or filter_mode %}<a href="{% url 'view_collections' fid=festival.id %}" class="btn btn-ghost btn-sm">✕ Clear</a>{% endif %}
+  </form>
+
+  <!-- List -->
+  {% for c in collections %}
+  <div class="coll-card">
+    <div class="coll-icon">💵</div>
+    <div class="coll-main">
+      <div class="coll-name">{{ c.donor_name }}</div>
+      <div class="coll-sub">
+        <span class="coll-sub-item">📅 {{ c.date_collected }}</span>
+        <span class="coll-sub-item">👤 Collected by {{ c.collected_by }}</span>
+        {% if c.receipt_no %}<span class="coll-sub-item">🧾 {{ c.receipt_no }}</span>{% endif %}
+        {% if c.notes %}<span class="coll-sub-item">📝 {{ c.notes }}</span>{% endif %}
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+      <div class="coll-amount">+₹{{ c.amount }}</div>
+      <span class="badge {% if c.payment_mode == 'Cash' %}badge-cash{% elif c.payment_mode == 'UPI' %}badge-upi{% elif c.payment_mode == 'Bank Transfer' %}badge-bank{% else %}badge-default{% endif %}">{{ c.payment_mode }}</span>
+      <form method="post" action="{% url 'delete_collection' fid=festival.id cid=c.id %}" onsubmit="return confirm('Delete this entry?')">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-ghost btn-sm btn-danger"><i class="ti ti-trash"></i></button>
+      </form>
+    </div>
+  </div>
+  {% empty %}
+  <div class="empty">
+    <div style="font-size:2.5rem;margin-bottom:10px;">💵</div>
+    <div>No chanda collections found.</div>
+    <a href="{% url 'add_collection' fid=festival.id %}" class="btn btn-primary" style="margin-top:14px;width:auto;"><i class="ti ti-plus"></i> Add First Chanda</a>
+  </div>
+  {% endfor %}
+</div>
+<script>
+function toggleTheme(){const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'':'dark');document.querySelector('.theme-toggle').textContent=d?'🌙':'☀️';localStorage.setItem('theme',d?'light':'dark');}
+(function(){const t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');document.addEventListener('DOMContentLoaded',()=>{const b=document.querySelector('.theme-toggle');if(b)b.textContent='☀️';});}})();
+</script>
+</body>
+</html>

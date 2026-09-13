@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+data_backup.json
+# Environment — NEVER commit
+.env
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data migration backup (remove after loading to production)
+data_backup.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
