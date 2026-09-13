@@ -201,6 +201,31 @@
   </div>
   {% endif %}
 
+  <!-- UPI & Cash Balance Breakdown -->
+  <div class="section-head" style="margin-top:20px;">
+    <div class="section-title">💳 UPI &amp; Cash Remaining</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+    <div class="kpi" style="border-left:4px solid var(--blue);">
+      <div class="kpi-icon">📲</div>
+      <div class="kpi-val" style="color:{% if upi_balance >= 0 %}var(--blue){% else %}var(--red){% endif %};">₹{{ upi_balance }}</div>
+      <div class="kpi-lbl">UPI Balance</div>
+      <div style="margin-top:8px;font-size:.72rem;color:var(--muted);line-height:1.6;">
+        <span style="color:var(--green);">+₹{{ upi_collected }}</span> collected<br>
+        <span style="color:var(--red);">−₹{{ upi_expenses }}</span> spent
+      </div>
+    </div>
+    <div class="kpi" style="border-left:4px solid var(--green);">
+      <div class="kpi-icon">💵</div>
+      <div class="kpi-val" style="color:{% if cash_balance >= 0 %}var(--green){% else %}var(--red){% endif %};">₹{{ cash_balance }}</div>
+      <div class="kpi-lbl">Cash in Hand</div>
+      <div style="margin-top:8px;font-size:.72rem;color:var(--muted);line-height:1.6;">
+        <span style="color:var(--green);">+₹{{ cash_collected }}</span> collected<br>
+        <span style="color:var(--red);">−₹{{ cash_expenses }}</span> spent
+      </div>
+    </div>
+  </div>
+
   <!-- Payment mode breakdown -->
   {% if coll_by_mode %}
   <div class="section-head" style="margin-top:20px;">

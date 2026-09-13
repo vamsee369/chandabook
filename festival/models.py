@@ -69,6 +69,38 @@ class Festival(models.Model):
         return self.total_collected - self.total_expenses
 
     @property
+    def upi_collected(self):
+        return self.collections.filter(payment_mode="UPI").aggregate(
+            t=models.Sum("amount")
+        )["t"] or Decimal("0")
+
+    @property
+    def cash_collected(self):
+        return self.collections.filter(payment_mode="Cash").aggregate(
+            t=models.Sum("amount")
+        )["t"] or Decimal("0")
+
+    @property
+    def upi_expenses(self):
+        return self.expenses.filter(payment_mode="UPI").aggregate(
+            t=models.Sum("amount")
+        )["t"] or Decimal("0")
+
+    @property
+    def cash_expenses(self):
+        return self.expenses.filter(payment_mode="Cash").aggregate(
+            t=models.Sum("amount")
+        )["t"] or Decimal("0")
+
+    @property
+    def upi_balance(self):
+        return self.upi_collected - self.upi_expenses
+
+    @property
+    def cash_balance(self):
+        return self.cash_collected - self.cash_expenses
+
+    @property
     def collection_pct(self):
         if self.target_collection and self.target_collection > 0:
             return min(100, int(self.total_collected / self.target_collection * 100))

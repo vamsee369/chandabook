@@ -125,6 +125,12 @@ def festival_dashboard(request, fid):
     total_expenses  = festival.total_expenses
     balance         = festival.balance
     target          = festival.target_collection
+    upi_balance     = festival.upi_balance
+    cash_balance    = festival.cash_balance
+    upi_collected   = festival.upi_collected
+    cash_collected  = festival.cash_collected
+    upi_expenses    = festival.upi_expenses
+    cash_expenses   = festival.cash_expenses
 
     # category breakdown for expenses
     exp_by_cat = (
@@ -166,6 +172,12 @@ def festival_dashboard(request, fid):
         "members_pending": members_pending,
         "total_promised": total_promised,
         "daily_json": dict(daily),
+        "upi_balance": upi_balance,
+        "cash_balance": cash_balance,
+        "upi_collected": upi_collected,
+        "cash_collected": cash_collected,
+        "upi_expenses": upi_expenses,
+        "cash_expenses": cash_expenses,
     })
 
 
